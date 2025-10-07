@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Sports Nutrition Store</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    h1 { text-align: center; }
+    .filters { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    select, button { padding: 8px; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+    .card { background: white; border-radius: 10px; padding: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .price { font-weight: bold; color: #333; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🏋️ Sports Nutrition Store</h1>
+
+  <div class="filters">
+    <select id="categorySelect">
+      <option value="">Усі категорії</option>
+    </select>
+    <select id="brandSelect">
+      <option value="">Усі бренди</option>
+    </select>
+    <select id="sortSelect">
+      <option value="">Без сортування</option>
+      <option value="priceAsc">Ціна ↑</option>
+      <option value="priceDesc">Ціна ↓</option>
+      <option value="nameAsc">Назва A-Z</option>
+      <option value="nameDesc">Назва Z-A</option>
+    </select>
+    <button id="filterBtn">Оновити</button>
+  </div>
+
+  <div class="grid" id="productGrid"></div>
+
+  <script>
+    const apiURL = "http://127.0.0.1:8000/api/products/";
+    const grid = document.getElementById("productGrid");
+    const brandSelect = document.getElementById("brandSelect");
+    const categorySelect = document.getElementById("categorySelect");
+    const sortSelect = document.getElementById("sortSelect");
+    const filterBtn = document.getElementById("filterBtn");
+
+    let allProducts = [];
+
+    async function fetchProducts() {
+      const res = await fetch(apiURL);
+      allProducts = await res.json();
+      renderProducts(allProducts);
+      fillFilters(allProducts);
+    }
+
+    function fillFilters(products) {
+      const brands = [...new Set(products.map(p => p.brand))];
+      const categories = [...new Set(products.map(p => p.category))];
+      brandSelect.innerHTML = '<option value="">Усі бренди</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+      categorySelect.innerHTML = '<option value="">Усі категорії</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function renderProducts(products) {
+      grid.innerHTML = products.map(p => `
+        <div class="card">
+          <img src="${p.image ? p.image : ''}" width="100%" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>${p.brand}</p>
+          <p>${p.category}</p>
+          <p class="price">${p.price} $</p>
+        </div>
+      `).join('');
+    }
+
+    function applyFilters() {
+      let filtered = [...allProducts];
+      const brand = brandSelect.value;
+      const category = categorySelect.value;
+      const sort = sortSelect.value;
+
+      if (brand) filtered = filtered.filter(p => p.brand === brand);
+      if (category) filtered = filtered.filter(p => p.category === category);
+
+      if (sort === "priceAsc") filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+      if (sort === "priceDesc") filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+      if (sort === "nameAsc") filtered.sort((a, b) => a.name.localeCompare(b.name));
+      if (sort === "nameDesc") filtered.sort((a, b) => b.name.localeCompare(a.name));
+
+      renderProducts(filtered);
+    }
+
+    filterBtn.addEventListener("click", applyFilters);
+    fetchProducts();
+  </script>
+</body>
+</html>
