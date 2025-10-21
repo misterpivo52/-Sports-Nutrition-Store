@@ -1,4 +1,4 @@
-```markdown
+
 # Sports Nutrition Store
 
 ## Description
@@ -393,4 +393,5 @@ A simple frontend is available in `index.html` that demonstrates:
 3. The frontend will communicate with the API via CORS
 
 ---
+
 
