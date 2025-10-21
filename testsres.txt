@@ -1,0 +1,62 @@
+PS D:\дз\sports-nutrition-store> pytest --cov
+=============================================================================== test session starts ===============================================================================
+platform win32 -- Python 3.12.0, pytest-7.4.0, pluggy-1.6.0
+django: settings: nutrition_store.settings (from ini)
+rootdir: D:\дз\sports-nutrition-store
+configfile: pytest.ini
+plugins: anyio-4.11.0, Faker-37.11.0, cov-4.1.0, django-4.5.2, factoryboy-2.5.0, pythonpath-0.7.3
+collected 23 items
+
+authentication\tests.py .......                                                                                                                                              [ 30%]
+products\tests.py ................                                                                                                                                           [100%]
+
+================================================================================ warnings summary =================================================================================
+C:\Users\makog\AppData\Local\Programs\Python\Python312\Lib\site-packages\rest_framework_simplejwt\__init__.py:1
+  C:\Users\makog\AppData\Local\Programs\Python\Python312\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+    from pkg_resources import DistributionNotFound, get_distribution
+
+C:\Users\makog\AppData\Local\Programs\Python\Python312\Lib\site-packages\pkg_resources\__init__.py:3146
+  C:\Users\makog\AppData\Local\Programs\Python\Python312\Lib\site-packages\pkg_resources\__init__.py:3146: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+authentication/tests.py::TestAuthenticationAPI::test_register_success
+authentication/tests.py::TestAuthenticationAPI::test_register_success
+authentication/tests.py::TestAuthenticationAPI::test_login_success
+authentication/tests.py::TestAuthenticationAPI::test_login_success
+  C:\Users\makog\AppData\Local\Programs\Python\Python312\Lib\site-packages\rest_framework_simplejwt\utils.py:26: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return make_utc(datetime.utcnow())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform win32, python 3.12.0-final-0 -----------
+Name                                        Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------
+authentication\__init__.py                      0      0   100%
+authentication\admin.py                         4      0   100%
+authentication\apps.py                          4      0   100%
+authentication\migrations\0001_initial.py       8      0   100%
+authentication\migrations\__init__.py           0      0   100%
+authentication\models.py                        8      1    88%   11
+authentication\serializers.py                  45      5    89%   23, 28, 30, 39, 41
+authentication\tests.py                        47      0   100%
+authentication\urls.py                          4      0   100%
+authentication\views.py                        56     12    79%   63, 70-80
+nutrition_store\__init__.py                     0      0   100%
+nutrition_store\settings.py                    27      0   100%
+nutrition_store\urls.py                         3      0   100%
+products\__init__.py                            0      0   100%
+products\admin.py                               1      0   100%
+products\apps.py                                4      0   100%
+products\migrations\0001_initial.py             6      0   100%
+products\migrations\__init__.py                 0      0   100%
+products\models.py                             29      3    90%   8, 19, 37
+products\serializers.py                        19      0   100%
+products\tests.py                              93      0   100%
+products\urls.py                                3      0   100%
+products\views.py                             150     57    62%   34, 41-44, 47-60, 63-78, 103, 110-113, 116-129, 132-147, 162-163, 187-188, 198
+-------------------------------------------------------------------------
+TOTAL                                         511     78    85%
+Coverage HTML written to dir htmlcov
+
+========================================================================= 23 passed, 6 warnings in 19.40s =========================================================================
