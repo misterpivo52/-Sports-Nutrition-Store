@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Products</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="auth-section">
+    <h3>Login</h3>
+    <input type="text" id="login-username" placeholder="Username">
+    <input type="password" id="login-password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <h3>Register</h3>
+    <input type="text" id="reg-username" placeholder="Username">
+    <input type="email" id="reg-email" placeholder="Email">
+    <input type="password" id="reg-password" placeholder="Password">
+    <input type="password" id="reg-password-check" placeholder="Repeat Password">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <div id="user-section" style="display:none">
+    <h3>Welcome, <span id="username-display"></span></h3>
+    <button onclick="logout()">Logout</button>
+    <button onclick="createProduct()">Create Product</button>
+  </div>
+
+  <h2>Products</h2>
+  <select id="brandFilter"><option value="">All Brands</option></select>
+  <select id="categoryFilter"><option value="">All Categories</option></select>
+  <div id="products"></div>
+
+  <script>
+    const api = "http://127.0.0.1:8000/api";
+    let accessToken = localStorage.getItem('accessToken');
+
+    function updateUI() {
+      if (accessToken) {
+        $("#auth-section").hide();
+        $("#user-section").show();
+      } else {
+        $("#auth-section").show();
+        $("#user-section").hide();
+      }
+    }
+
+    function login() {
+      const username = $("#login-username").val();
+      const password = $("#login-password").val();
+
+      $.ajax({
+        url: api + "/auth/login/",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ username, password }),
+        success: function(data) {
+          accessToken = data.access;
+          localStorage.setItem('accessToken', accessToken);
+          $("#username-display").text(data.user.username);
+          updateUI();
+          alert("Login successful");
+        },
+        error: function() {
+          alert("Login failed");
+        }
+      });
+    }
+
+    function register() {
+      const username = $("#reg-username").val();
+      const email = $("#reg-email").val();
+      const password = $("#reg-password").val();
+      const passwordCheck = $("#reg-password-check").val();
+
+      $.ajax({
+        url: api + "/auth/register/",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          username,
+          email,
+          password,
+          password_check: passwordCheck
+        }),
+        success: function(data) {
+          accessToken = data.access;
+          localStorage.setItem('accessToken', accessToken);
+          $("#username-display").text(data.user.username);
+          updateUI();
+          alert("Registration successful");
+        },
+        error: function(xhr) {
+          alert("Registration failed: " + JSON.stringify(xhr.responseJSON));
+        }
+      });
+    }
+
+    function logout() {
+      $.ajax({
+        url: api + "/auth/logout/",
+        method: "POST",
+        contentType: "application/json",
+        headers: { "Authorization": "Bearer " + accessToken },
+        success: function() {
+          accessToken = null;
+          localStorage.removeItem('accessToken');
+          updateUI();
+          alert("Logged out");
+        }
+      });
+    }
+
+    function createProduct() {
+      const name = prompt("Product name:");
+      const brand = prompt("Brand ID:");
+      const category = prompt("Category ID:");
+      const description = prompt("Description:");
+      const price = prompt("Price:");
+
+      $.ajax({
+        url: api + "/products/",
+        method: "POST",
+        contentType: "application/json",
+        headers: { "Authorization": "Bearer " + accessToken },
+        data: JSON.stringify({
+          name, brand, category, description, price
+        }),
+        success: function() {
+          alert("Product created");
+          loadProducts();
+        },
+        error: function(xhr) {
+          alert("Failed: " + JSON.stringify(xhr.responseJSON));
+        }
+      });
+    }
+
+    function loadFilters() {
+      $.getJSON(api + "/brands/", function(brands) {
+        brands.forEach(brand => {
+          $("#brandFilter").append(`<option value="${brand.name}">${brand.name}</option>`);
+        });
+      });
+
+      $.getJSON(api + "/categories/", function(categories) {
+        categories.forEach(category => {
+          $("#categoryFilter").append(`<option value="${category.name}">${category.name}</option>`);
+        });
+      });
+    }
+
+    function loadProducts() {
+      $.getJSON(api + "/products/", function(products) {
+        const brand = $("#brandFilter").val();
+        const cat = $("#categoryFilter").val();
+
+        const filtered = products.filter(p =>
+          (!brand || p.brand_name === brand) &&
+          (!cat || p.category_name === cat)
+        );
+
+        $("#products").html(
+          filtered.map(p => `
+            <div style="border:1px solid #ccc; padding:10px; margin:10px; display:inline-block; width:200px;">
+              <img src="${p.image}" style="width:100%">
+              <h4>${p.name}</h4>
+              <p>${p.brand_name} | ${p.category_name}</p>
+              <p>${p.price}$</p>
+            </div>
+          `).join("")
+        );
+      });
+    }
+
+    $("#brandFilter, #categoryFilter").on("change", loadProducts);
+
+    // Initialize
+    loadFilters();
+    loadProducts();
+    updateUI();
+  </script>
+</body>
+</html>
