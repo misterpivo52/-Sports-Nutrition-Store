@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Products</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    select { margin: 10px; padding: 5px; }
+    .product { border: 1px solid #ccc; padding: 10px; margin: 10px; width: 200px; display: inline-block; vertical-align: top; }
+    img { width: 100%; }
+  </style>
+</head>
+<body>
+  <h2>Products</h2>
+  <select id="brandFilter"><option value="">All Brands</option></select>
+  <select id="categoryFilter"><option value="">All Categories</option></select>
+  <div id="products"></div>
+
+  <script>
+    const api = "http://127.0.0.1:8000/api";
+    function loadFilters() {
+      $.getJSON(api + "/brands/", b => {
+        b.forEach(x => $("#brandFilter").append(`<option value="${x.name}">${x.name}</option>`));
+      });
+      $.getJSON(api + "/categories/", c => {
+        c.forEach(x => $("#categoryFilter").append(`<option value="${x.name}">${x.name}</option>`));
+      });
+    }
+    function loadProducts() {
+      $.getJSON(api + "/products/", p => {
+        const brand = $("#brandFilter").val();
+        const cat = $("#categoryFilter").val();
+        let f = p.filter(x => (!brand || x.brand_name === brand) && (!cat || x.category_name === cat));
+        $("#products").html(f.map(x => `
+          <div class="product">
+            <img src="${x.image}">
+            <h4>${x.name}</h4>
+            <p>${x.brand_name} | ${x.category_name}</p>
+            <p>${x.price}$</p>
+          </div>`).join(""));
+      });
+    }
+    $("#brandFilter, #categoryFilter").on("change", loadProducts);
+    loadFilters();
+    loadProducts();
+  </script>
+</body>
+</html>
